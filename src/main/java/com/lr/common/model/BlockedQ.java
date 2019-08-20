@@ -35,35 +35,43 @@ public class BlockedQ<T> {
     }
 
     public void doPush(T num) {
-        lock.lock();
-        while(queue.size() >= 16) {
-            try {
+        try {
+            lock.lock();
+            while(queue.size() >= 16) {
+
                 System.out.println(Thread.currentThread().getName() + ": no available space waiting!");
                 notFull.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println("push");
+
             }
+            queue.add(num);
+            System.out.println(Thread.currentThread().getName() + " push:" + num);
+            notEmpty.signalAll();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
         }
-        queue.add(num);
-        System.out.println(Thread.currentThread().getName() + " push:" + num);
-        notEmpty.signalAll();
-        lock.unlock();
     }
 
     public T doPoll() {
-        lock.lock();
-        while(queue.isEmpty()) {
-            try {
+        T res = null;
+        try {
+            lock.lock();
+            while(queue.isEmpty()) {
                 System.out.println(Thread.currentThread().getName() + ": no data waiting!");
                 notEmpty.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println("poll");
+
             }
+            res = queue.poll();
+            System.out.println(Thread.currentThread().getName() + " poll:" + res);
+            notFull.signalAll();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
         }
-        T res = queue.poll();
-        System.out.println(Thread.currentThread().getName() + " poll:" + res);
-        notFull.signalAll();
-        lock.unlock();
         return res;
     }
 }
