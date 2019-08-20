@@ -27,11 +27,11 @@ public class BlockedQ<T> {
         this.size = s;
     }
 
-    static <T> BlockedQ<T> getIns() {
+    public static <T> BlockedQ<T> getIns() {
         return getIns(16);
     }
 
-    static <T> BlockedQ<T> getIns(int size) {
+    public static <T> BlockedQ<T> getIns(int size) {
         if(blockedQ == null) {
             synchronized(BlockedQ.class) {
                 if(blockedQ == null) {
