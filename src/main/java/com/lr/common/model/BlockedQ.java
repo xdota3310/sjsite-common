@@ -1,6 +1,7 @@
 package com.lr.common.model;
 
 import java.util.ArrayDeque;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -20,14 +21,21 @@ public class BlockedQ<T> {
 
     private static volatile BlockedQ blockedQ = null;
 
-    private BlockedQ() {
+    private int size;
+
+    private BlockedQ(int s) {
+        this.size = s;
     }
 
-    public static <T> BlockedQ<T> getIns() {
+    static <T> BlockedQ<T> getIns() {
+        return getIns(16);
+    }
+
+    static <T> BlockedQ<T> getIns(int size) {
         if(blockedQ == null) {
             synchronized(BlockedQ.class) {
                 if(blockedQ == null) {
-                    blockedQ = new BlockedQ<>();
+                    blockedQ = new BlockedQ<>(size);
                 }
             }
         }
@@ -35,42 +43,67 @@ public class BlockedQ<T> {
     }
 
     public void doPush(T num) {
-        try {
-            lock.lock();
-            while(queue.size() >= 16) {
-
-                System.out.println(Thread.currentThread().getName() + ": no available space waiting!");
-                notFull.await();
-                System.out.println("push");
-
+        if(lock.tryLock()) {
+            try {
+                while(queue.size() >= size) {
+                    System.out.println(Thread.currentThread().getName() + ": no available space waiting!");
+                    notFull.await();
+                }
+                queue.add(num);
+                System.out.println(Thread.currentThread().getName() + " push:" + num);
+                notEmpty.signalAll();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                lock.unlock();
             }
-            queue.add(num);
-            System.out.println(Thread.currentThread().getName() + " push:" + num);
-            notEmpty.signalAll();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            lock.unlock();
         }
     }
 
     public T doPoll() {
         T res = null;
-        try {
-            lock.lock();
-            while(queue.isEmpty()) {
-                System.out.println(Thread.currentThread().getName() + ": no data waiting!");
-                notEmpty.await();
-                System.out.println("poll");
-
+        if(lock.tryLock()) {
+            try {
+                while(queue.isEmpty()) {
+                    System.out.println(Thread.currentThread().getName() + ": no data waiting!");
+                    notEmpty.await();
+                }
+                res = queue.poll();
+                System.out.println(Thread.currentThread().getName() + " poll:" + res);
+                notFull.signalAll();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                lock.unlock();
             }
-            res = queue.poll();
-            System.out.println(Thread.currentThread().getName() + " poll:" + res);
-            notFull.signalAll();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            lock.unlock();
+        }
+        return res;
+    }
+
+    public T doPoll(long millis) {
+        T res = null;
+        long start = System.currentTimeMillis();
+        if(lock.tryLock()) {
+            try {
+                while(queue.isEmpty()) {
+                    System.out.println(Thread.currentThread().getName() + ": no data waiting!");
+                    notEmpty.await(millis, TimeUnit.MILLISECONDS);
+                    long cur = System.currentTimeMillis();
+                    if(!queue.isEmpty() || cur - start > millis) {
+                        break;
+                    }
+                }
+                if(queue.isEmpty()) {
+                    return res;
+                }
+                res = queue.poll();
+                System.out.println(Thread.currentThread().getName() + " poll:" + res);
+                notFull.signalAll();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                lock.unlock();
+            }
         }
         return res;
     }
