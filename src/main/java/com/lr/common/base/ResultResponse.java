@@ -33,22 +33,24 @@ public class ResultResponse<T> implements Serializable {
 
     private T data;
 
+    protected ResultResponse() {
+    }
 
-    private ResultResponse(String code) {
+    protected ResultResponse(String code) {
         this.code = code;
     }
 
-    private ResultResponse(String code, String message) {
+    protected ResultResponse(String code, String message) {
         this.code = code;
         this.message = message;
     }
 
-    private ResultResponse(String code, T data) {
+    protected ResultResponse(String code, T data) {
         this.code = code;
         this.data = data;
     }
 
-    private ResultResponse(String code, String message, T data) {
+    protected ResultResponse(String code, String message, T data) {
         this.code = code;
         this.message = message;
         this.data = data;
