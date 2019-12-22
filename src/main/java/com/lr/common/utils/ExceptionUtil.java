@@ -16,6 +16,7 @@ public class ExceptionUtil {
         stringBuilder.append(e.getMessage());
         for(int i = 0; i < 6; i++) {
             stringBuilder.append("\n");
+            stringBuilder.append("\t");
             stringBuilder.append(stackTraceElement[i] == null ? "" : stackTraceElement[i].toString());
         }
 
