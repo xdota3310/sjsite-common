@@ -105,7 +105,7 @@ public class ResultResponse<T> implements Serializable {
      *      
      */
     public static <T> ResultResponse<T> createByError(String errorCode, String... args) {
-        return new ResultResponse<T>(errorCode, "");
+        return new ResultResponse<T>(errorCode, args.toString());
     }
 
     public static <T> ResultResponse<T> createByError(String errorCode, String msg) {

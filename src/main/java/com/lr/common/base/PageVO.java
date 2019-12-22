@@ -18,9 +18,15 @@ public class PageVO {
 
     private Integer type;
 
-    @Override
-    public String toString() {
-        return "PageVO{" + "pageNum=" + pageNum + ", pageSize=" + pageSize + ", query='" + query + '\'' + ", type=" + type + '}';
+    private String timeString;
+
+
+    public String getTimeString() {
+        return timeString;
+    }
+
+    public void setTimeString(String timeString) {
+        this.timeString = timeString;
     }
 
     public Integer getType() {
