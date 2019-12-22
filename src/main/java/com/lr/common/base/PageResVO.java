@@ -9,7 +9,7 @@ import java.util.List;
  * @author shijie.xu
  * @since 2019年01月04日
  */
-public class PageResVO<T> extends ResultResponse {
+public class PageResVO<T>{
     /**
      * 分页总数
      */
@@ -36,25 +36,12 @@ public class PageResVO<T> extends ResultResponse {
         this.resList = resList;
     }
 
-    public PageResVO(String code, String message, Integer sum, List<T> resList) {
-        super(code, message);
+    public PageResVO() {
+    }
+
+    public PageResVO(Integer sum, List<T> resList) {
         this.sum = sum;
         this.resList = resList;
-    }
-
-    public PageResVO(String code, String message) {
-        super(code, message);
-        this.sum = 0;
-        this.resList = new ArrayList<>();
-    }
-
-
-    public static <T> PageResVO<T> createError(String errorCode, String msg) {
-        return new PageResVO<T>(errorCode, msg);
-    }
-
-    public static <T> PageResVO<T> createSuccess(String code, String message, Integer sum, List<T> resList) {
-        return new PageResVO<T>(code, message, sum, resList);
     }
 
     @Override

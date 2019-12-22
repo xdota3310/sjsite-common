@@ -60,4 +60,9 @@ public class PageVO {
     public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
     }
+
+    @Override
+    public String toString() {
+        return "PageVO{" + "pageNum=" + pageNum + ", pageSize=" + pageSize + ", query='" + query + '\'' + ", type=" + type + ", timeString='" + timeString + '\'' + '}';
+    }
 }
