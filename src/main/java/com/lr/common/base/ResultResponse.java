@@ -1,7 +1,5 @@
 package com.lr.common.base;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,8 +56,6 @@ public class ResultResponse<T> implements Serializable {
         this.data = data;
     }
 
-    // json 序列号过滤
-    @JsonIgnore
     public boolean isSuccess() {
         return this.code.equals(SUCCESS);
     }
